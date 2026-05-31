@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Premium custom jerseys for teams, clubs, and fans. Order online with fast delivery.">
+  <title>KitCulture — Premium Jerseys Online</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  
+  <!-- Navigation -->
+  <header class="header" id="header">
+    <nav class="nav container">
+      <a href="#" class="logo">
+        <img src="images/profile-logo.jpg" alt="KitCulture" class="logo-img" width="42" height="42">
+        <span class="logo-text">Kit<span class="accent">Culture</span></span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#shop">Shop</a></li>
+        <li><a href="#custom">Custom</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <button class="cart-btn" id="cartBtn" aria-label="Open cart">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+        <span class="cart-count" id="cartCount">0</span>
+      </button>
+    </nav>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero" id="home">
+    <div class="hero-bg"></div>
+    <div class="hero-content container">
+      <p class="hero-tag">New Season Collection 2026</p>
+      <h1>Wear Your<br><span class="accent">Passion</span></h1>
+      <p class="hero-desc">Premium quality jerseys for teams, clubs, and fans. Custom designs, fast delivery, unbeatable prices.</p>
+      <div class="hero-actions">
+        <a href="#shop" class="btn btn-primary">Shop Now</a>
+        <a href="#custom" class="btn btn-outline">Custom Order</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat">
+          <strong>500+</strong>
+          <span>Happy Teams</span>
+        </div>
+        <div class="stat">
+          <strong>48hr</strong>
+          <span>Fast Delivery</span>
+        </div>
+        <div class="stat">
+          <strong>100%</strong>
+          <span>Quality Guarantee</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Categories -->
+  <section class="categories container">
+    <a href="#shop" class="category-card reveal reveal-delay-1" data-filter="football">
+      <div class="category-icon">⚽</div>
+      <h3>Football</h3>
+      <p>Club & national kits</p>
+    </a>
+    <a href="#shop" class="category-card reveal reveal-delay-2" data-filter="basketball">
+      <div class="category-icon">🏀</div>
+      <h3>Basketball</h3>
+      <p>NBA & custom</p>
+    </a>
+    <a href="#shop" class="category-card reveal reveal-delay-3" data-filter="cricket">
+      <div class="category-icon">🏏</div>
+      <h3>Cricket</h3>
+      <p>Team uniforms</p>
+    </a>
+    <a href="#shop" class="category-card reveal reveal-delay-4" data-filter="custom">
+      <div class="category-icon">✨</div>
+      <h3>Custom</h3>
+      <p>Your design</p>
+    </a>
+  </section>
+
+  <!-- Shop -->
+  <section class="shop section" id="shop">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Featured Jerseys</h2>
+        <p>Fresh drops from our Instagram — DM us on @kitculture.99 to order</p>
+      </div>
+      <div class="filter-bar reveal reveal-delay-1">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="football">Football</button>
+        <button class="filter-btn" data-filter="basketball">Basketball</button>
+        <button class="filter-btn" data-filter="cricket">Cricket</button>
+      </div>
+      <div class="product-grid" id="productGrid">
+        <!-- Products injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Custom Order -->
+  <section class="custom section" id="custom">
+    <div class="container custom-grid">
+      <div class="custom-content reveal">
+        <h2>Need a Custom Jersey?</h2>
+        <p>We design and print jerseys for your entire team. Send us your logo, colors, and player names — we'll handle the rest.</p>
+        <ul class="custom-features">
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Any sport, any design
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Bulk team discounts
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            Free design mockup
+          </li>
+          <li>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+            7–10 day turnaround
+          </li>
+        </ul>
+        <a href="#contact" class="btn btn-primary">Get a Quote</a>
+      </div>
+      <div class="custom-visual reveal reveal-delay-2">
+        <div class="jersey-preview">
+          <div class="jersey-shirt">
+            <span class="jersey-number">10</span>
+            <span class="jersey-name">YOUR NAME</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about section" id="about">
+    <div class="container">
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <h2>About Us</h2>
+          <p>We started with a simple idea: every team deserves quality jerseys at fair prices. Today we serve clubs, schools, and fans across the country with premium fabrics, sharp prints, and reliable service.</p>
+          <p>Whether you need 10 jerseys for a local club or 200 for a tournament, we deliver on time — every time.</p>
+        </div>
+        <div class="about-cards">
+          <div class="about-card reveal reveal-delay-1">
+            <div class="about-card-icon">🏆</div>
+            <h4>Premium Quality</h4>
+            <p>Breathable, durable fabrics built for match day.</p>
+          </div>
+          <div class="about-card reveal reveal-delay-2">
+            <div class="about-card-icon">🚚</div>
+            <h4>Fast Shipping</h4>
+            <p>Standard and express delivery options available.</p>
+          </div>
+          <div class="about-card reveal reveal-delay-3">
+            <div class="about-card-icon">💬</div>
+            <h4>Easy Ordering</h4>
+            <p>Order via WhatsApp, DM, or our contact form.</p>
+          </div>
+          <div class="about-card reveal reveal-delay-4">
+            <div class="about-card-icon">🔄</div>
+            <h4>Easy Returns</h4>
+            <p>Wrong size? We'll swap it — no hassle.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="contact section" id="contact">
+    <div class="container">
+      <div class="section-header reveal">
+        <h2>Get in Touch</h2>
+        <p>Questions, bulk orders, or custom designs — we're here to help.</p>
+      </div>
+      <div class="contact-grid">
+        <form class="contact-form reveal reveal-delay-1" id="contactForm">
+          <div class="form-group">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" required placeholder="John Doe">
+          </div>
+          <div class="form-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" required placeholder="7559031723">
+          </div>
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <select id="subject" name="subject">
+              <option value="order">Place an Order</option>
+              <option value="custom">Custom Team Jerseys</option>
+              <option value="bulk">Bulk / Wholesale</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="message">Message</label>
+            <textarea id="message" name="message" rows="4" required placeholder="Tell us what you need — sizes, quantity, design ideas..."></textarea>
+          </div>
+          <button type="submit" class="btn btn-primary btn-full">Send Message</button>
+        </form>
+        <div class="contact-info">
+          <div class="contact-item reveal reveal-delay-2">
+            <div class="contact-item-icon">📱</div>
+            <div>
+              <h4>WhatsApp</h4>
+              <a href="https://wa.me/919072114858" target="_blank" rel="noopener">9072114858</a>
+            </div>
+          </div>
+          <div class="contact-item reveal reveal-delay-3">
+            <div class="contact-item-icon">📸</div>
+            <div>
+              <h4>Instagram</h4>
+              <a href="https://instagram.com/kitculture.99" target="_blank" rel="noopener">@kitculture.99</a>
+            </div>
+          </div>
+          <div class="contact-item reveal reveal-delay-4">
+            <div class="contact-item-icon">🕐</div>
+            <div>
+              <h4>Hours</h4>
+              <p>Mon – Sat: 9am – 8pm</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a href="#" class="logo">
+          <img src="images/profile-logo.jpg" alt="KitCulture" class="logo-img" width="42" height="42">
+          <span class="logo-text">Kit<span class="accent">Culture</span></span>
+        </a>
+        <p>Premium jerseys for teams and fans. Order online, wear with pride.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#shop">Shop</a></li>
+          <li><a href="#custom">Custom Orders</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+      <div class="footer-links">
+        <h4>Policies</h4>
+        <ul>
+          <li><a href="#">Shipping Info</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Size Guide</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom container">
+      <p>&copy; 2026 KitCulture. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <!-- Cart Sidebar -->
+  <div class="cart-overlay" id="cartOverlay"></div>
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h3>Your Cart</h3>
+      <button class="cart-close" id="cartClose" aria-label="Close cart">&times;</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <p class="cart-empty">Your cart is empty</p>
+    </div>
+    <div class="cart-footer">
+      <button class="btn btn-primary btn-full" id="checkoutBtn">Checkout via WhatsApp</button>
+    </div>
+  </aside>
+
+  <!-- Product Modal -->
+  <div class="modal-overlay" id="modalOverlay"></div>
+  <div class="modal" id="productModal">
+    <button class="modal-close" id="modalClose" aria-label="Close">&times;</button>
+    <div class="modal-body" id="modalBody"></div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
