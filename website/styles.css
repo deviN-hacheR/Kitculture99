@@ -568,7 +568,7 @@ button, input, select, textarea {
 /* ===== Categories ===== */
 .categories {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   gap: 1rem;
   margin-top: -3rem;
   position: relative;
@@ -727,6 +727,7 @@ button, input, select, textarea {
 .product-image.football { background: linear-gradient(135deg, #1a3a2a 0%, #0d2818 100%); }
 .product-image.basketball { background: linear-gradient(135deg, #3a1a1a 0%, #28100d 100%); }
 .product-image.cricket { background: linear-gradient(135deg, #1a2a3a 0%, #0d1828 100%); }
+.product-image.kids { background: linear-gradient(135deg, #3a2a1a 0%, #281a0d 100%); }
 
 .product-badge {
   position: absolute;
