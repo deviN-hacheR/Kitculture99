@@ -19,7 +19,7 @@ const STORE_CONFIG = {
   whatsappNumber: '919072114858',
   instagramHandle: 'kitculture.99',
   currency: '\u20b9', // Indian Rupee
-  categories: ['football', 'basketball', 'cricket'],
+  categories: ['football', 'basketball', 'cricket', 'kids'],
   sizes: ['S', 'M', 'L', 'XL', 'XXL']
 };
 
