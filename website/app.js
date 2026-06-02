@@ -447,21 +447,33 @@ function initIntro() {
   });
 }
 
-// Keep the storefront in sync with admin panel changes (other tabs + same tab).
-function refreshProducts() {
-  products = loadProducts();
-  renderProducts(currentFilter);
+// Keep the storefront in sync with the shared backend (so products added on
+// any device show up here). Falls back to the local cache when offline.
+async function syncFromApi() {
+  try {
+    const fresh = await fetchProductsFromApi();
+    products = fresh;
+    renderProducts(currentFilter);
+  } catch (e) {
+    // Offline or backend unreachable — keep showing the cached catalog.
+  }
 }
+// Same-tab/local cache changes (e.g. admin in another tab writing the cache).
 window.addEventListener('storage', (e) => {
-  if (e.key === STORE_KEY) refreshProducts();
+  if (e.key === STORE_KEY) {
+    products = loadProducts();
+    renderProducts(currentFilter);
+  }
 });
 document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === 'visible') refreshProducts();
+  if (document.visibilityState === 'visible') syncFromApi();
 });
 
 // ===== Init =====
-renderProducts();
+renderProducts(); // instant render from cache
 updateCartUI();
+syncFromApi();                 // refresh from shared backend
+setInterval(syncFromApi, 15000); // pick up changes from other devices
 initScrollReveal();
 initCountUp();
 initScrollProgress();
