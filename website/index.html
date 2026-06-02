@@ -11,7 +11,15 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  
+
+  <!-- Cinematic intro curtain -->
+  <div class="intro-curtain" id="introCurtain" aria-hidden="true">
+    <span class="intro-logo">Kit<span class="accent">Culture</span></span>
+  </div>
+
+  <!-- Scroll progress bar -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
   <!-- Navigation -->
   <header class="header" id="header">
     <nav class="nav container">
@@ -269,6 +277,7 @@
           <li><a href="#">Shipping Info</a></li>
           <li><a href="#">Returns</a></li>
           <li><a href="#">Size Guide</a></li>
+          <li><a href="admin.html">Admin</a></li>
         </ul>
       </div>
     </div>
@@ -302,6 +311,12 @@
   <!-- Toast -->
   <div class="toast" id="toast"></div>
 
+  <!-- Back to top -->
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script src="store.js"></script>
   <script src="app.js"></script>
 </body>
 </html>
