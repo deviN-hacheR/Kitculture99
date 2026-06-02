@@ -5,6 +5,15 @@
 
 const STORE_KEY = 'kitculture-products-v1';
 
+// ===== Shared backend (Supabase) =====
+// Holds the catalog for ALL devices. Products live in a Postgres table and
+// admin-uploaded photos in a public Storage bucket, so changes made in the
+// admin panel sync to every device. If these are blank or unreachable, the
+// site falls back to this browser's localStorage (offline cache).
+const SUPABASE_URL = 'https://yugjonedhgvrppwfjaxt.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_WP4QTOiAcnHn4dPL81ivBA_iTe58sv0';
+const SUPABASE_BUCKET = 'product-photos';
+
 const STORE_CONFIG = {
   businessName: 'KitCulture',
   whatsappNumber: '919072114858',
@@ -13,6 +22,17 @@ const STORE_CONFIG = {
   categories: ['football', 'basketball', 'cricket'],
   sizes: ['S', 'M', 'L', 'XL', 'XXL']
 };
+
+function supaConfigured() {
+  return Boolean(SUPABASE_URL && SUPABASE_ANON_KEY);
+}
+
+function supaHeaders(extra) {
+  return Object.assign({
+    apikey: SUPABASE_ANON_KEY,
+    Authorization: 'Bearer ' + SUPABASE_ANON_KEY
+  }, extra || {});
+}
 
 const DEFAULT_PRODUCTS = [
   {
@@ -153,4 +173,84 @@ function formatPrice(price) {
   const num = Number(price);
   if (Number.isNaN(num)) return '';
   return STORE_CONFIG.currency + num.toLocaleString('en-IN');
+}
+
+// ===== Shared backend API (Supabase REST + Storage) =====
+const ADMIN_PASSWORD = 'nsk';
+
+// Fetch the shared catalog from Supabase and cache it for instant/offline loads.
+async function fetchProductsFromApi() {
+  if (!supaConfigured()) throw new Error('Supabase not configured');
+  const res = await fetch(
+    SUPABASE_URL + '/rest/v1/products?select=*&order=id.asc',
+    { headers: supaHeaders(), cache: 'no-store' }
+  );
+  if (!res.ok) throw new Error('Failed to load products (' + res.status + ')');
+  const rows = await res.json();
+  const products = (Array.isArray(rows) ? rows : []).map(normalizeProduct);
+  saveProducts(products); // cache for offline / instant render
+  return products;
+}
+
+// Upload a photo to the public Storage bucket and return its public URL.
+async function uploadProductPhoto(file) {
+  const ext = (file.name && file.name.indexOf('.') >= 0)
+    ? file.name.split('.').pop().toLowerCase()
+    : 'jpg';
+  const path = Date.now() + '-' + Math.random().toString(36).slice(2, 10) + '.' + ext;
+  const res = await fetch(
+    SUPABASE_URL + '/storage/v1/object/' + SUPABASE_BUCKET + '/' + path,
+    {
+      method: 'POST',
+      headers: supaHeaders({
+        'Content-Type': file.type || 'application/octet-stream',
+        'x-upsert': 'true'
+      }),
+      body: file
+    }
+  );
+  if (!res.ok) throw new Error('Photo upload failed (' + res.status + ')');
+  return SUPABASE_URL + '/storage/v1/object/public/' + SUPABASE_BUCKET + '/' + path;
+}
+
+async function apiAddProduct({ name, price, category, badge, description, file }) {
+  if (!supaConfigured()) throw new Error('Supabase not configured');
+  const imageUrl = await uploadProductPhoto(file);
+  const row = {
+    name: name || 'Untitled',
+    category: STORE_CONFIG.categories.includes(category) ? category : 'football',
+    image: imageUrl,
+    badge: badge || null,
+    price: (price === null || price === undefined || price === '') ? null : Number(price),
+    available: true,
+    description: description || 'New arrival. DM @kitculture.99 to order.'
+  };
+  const res = await fetch(SUPABASE_URL + '/rest/v1/products', {
+    method: 'POST',
+    headers: supaHeaders({ 'Content-Type': 'application/json', Prefer: 'return=representation' }),
+    body: JSON.stringify(row)
+  });
+  if (!res.ok) throw new Error('Add failed (' + res.status + ')');
+  return (await res.json())[0];
+}
+
+async function apiUpdateProduct(id, changes) {
+  if (!supaConfigured()) throw new Error('Supabase not configured');
+  const res = await fetch(SUPABASE_URL + '/rest/v1/products?id=eq.' + id, {
+    method: 'PATCH',
+    headers: supaHeaders({ 'Content-Type': 'application/json', Prefer: 'return=representation' }),
+    body: JSON.stringify(changes)
+  });
+  if (!res.ok) throw new Error('Update failed (' + res.status + ')');
+  return (await res.json())[0];
+}
+
+async function apiDeleteProduct(id) {
+  if (!supaConfigured()) throw new Error('Supabase not configured');
+  const res = await fetch(SUPABASE_URL + '/rest/v1/products?id=eq.' + id, {
+    method: 'DELETE',
+    headers: supaHeaders()
+  });
+  if (!res.ok) throw new Error('Delete failed (' + res.status + ')');
+  return true;
 }

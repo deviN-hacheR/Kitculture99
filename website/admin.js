@@ -4,7 +4,7 @@
 // see the password. For a public store, move stock management behind a real
 // backend with server-side auth.
 
-const ADMIN_PASSWORD = 'nsk';
+// ADMIN_PASSWORD is defined in store.js (shared with the backend API calls).
 const AUTH_KEY = 'kitculture-admin-auth';
 
 // ===== Elements =====
@@ -30,6 +30,7 @@ const adminCount = document.getElementById('adminCount');
 const toast = document.getElementById('toast');
 
 let pendingPhotoDataUrl = '';
+let pendingPhotoFile = null;
 
 // ===== Toast =====
 function showToast(message) {
@@ -75,8 +76,17 @@ logoutBtn.addEventListener('click', () => {
 });
 
 // ===== Render product list =====
-function renderAdminProducts() {
-  const products = loadProducts();
+let adminProductsCache = [];
+
+async function renderAdminProducts() {
+  let products;
+  try {
+    products = await fetchProductsFromApi();
+  } catch (e) {
+    products = loadProducts();
+    showToast('Offline — showing cached catalog');
+  }
+  adminProductsCache = products;
   adminCount.textContent = `${products.length} item${products.length === 1 ? '' : 's'}`;
 
   if (!products.length) {
@@ -122,25 +132,29 @@ function renderAdminProducts() {
   });
 }
 
-function toggleAvailability(id, available) {
-  const products = loadProducts();
-  const product = products.find(p => p.id === id);
-  if (!product) return;
-  product.available = available;
-  saveProducts(products);
+async function toggleAvailability(id, available) {
+  const product = adminProductsCache.find(p => p.id === id);
+  const label = product ? product.name : 'Product';
+  try {
+    await apiUpdateProduct(id, { available });
+    showToast(`${label} marked ${available ? 'In Stock' : 'Sold Out'}`);
+  } catch (e) {
+    showToast('Could not update — check connection');
+  }
   renderAdminProducts();
-  showToast(`${product.name} marked ${available ? 'In Stock' : 'Sold Out'}`);
 }
 
-function deleteProduct(id) {
-  const products = loadProducts();
-  const product = products.find(p => p.id === id);
-  if (!product) return;
-  if (!window.confirm(`Delete "${product.name}"? This cannot be undone.`)) return;
-  const next = products.filter(p => p.id !== id);
-  saveProducts(next);
+async function deleteProduct(id) {
+  const product = adminProductsCache.find(p => p.id === id);
+  const label = product ? product.name : 'this product';
+  if (!window.confirm(`Delete "${label}"? This cannot be undone.`)) return;
+  try {
+    await apiDeleteProduct(id);
+    showToast(`${label} deleted`);
+  } catch (e) {
+    showToast('Could not delete — check connection');
+  }
   renderAdminProducts();
-  showToast(`${product.name} deleted`);
 }
 
 // ===== Add product =====
@@ -148,9 +162,11 @@ newPhoto.addEventListener('change', () => {
   const file = newPhoto.files && newPhoto.files[0];
   if (!file) {
     pendingPhotoDataUrl = '';
+    pendingPhotoFile = null;
     photoPreview.hidden = true;
     return;
   }
+  pendingPhotoFile = file;
   const reader = new FileReader();
   reader.onload = () => {
     pendingPhotoDataUrl = reader.result;
@@ -160,35 +176,39 @@ newPhoto.addEventListener('change', () => {
   reader.readAsDataURL(file);
 });
 
-addProductForm.addEventListener('submit', (e) => {
+addProductForm.addEventListener('submit', async (e) => {
   e.preventDefault();
 
-  if (!pendingPhotoDataUrl) {
+  if (!pendingPhotoFile) {
     showToast('Please choose a product photo');
     return;
   }
 
-  const products = loadProducts();
+  const submitBtn = addProductForm.querySelector('[type="submit"]');
+  if (submitBtn) submitBtn.disabled = true;
+
   const priceVal = newPrice.value.trim();
-  const product = {
-    id: nextProductId(products),
-    name: newName.value.trim() || 'Untitled',
-    category: newCategory.value,
-    image: pendingPhotoDataUrl,
-    badge: newBadge.value.trim() || null,
-    price: priceVal === '' ? null : Number(priceVal),
-    available: true,
-    description: newDescription.value.trim() || 'New arrival. DM @kitculture.99 to order.'
-  };
-
-  products.push(product);
-  saveProducts(products);
-  renderAdminProducts();
-
-  addProductForm.reset();
-  pendingPhotoDataUrl = '';
-  photoPreview.hidden = true;
-  showToast(`${product.name} added to the store`);
+  const name = newName.value.trim() || 'Untitled';
+  try {
+    await apiAddProduct({
+      name,
+      price: priceVal === '' ? null : Number(priceVal),
+      category: newCategory.value,
+      badge: newBadge.value.trim() || null,
+      description: newDescription.value.trim() || '',
+      file: pendingPhotoFile
+    });
+    addProductForm.reset();
+    pendingPhotoDataUrl = '';
+    pendingPhotoFile = null;
+    photoPreview.hidden = true;
+    await renderAdminProducts();
+    showToast(`${name} added to the store`);
+  } catch (err) {
+    showToast('Could not add product — check connection');
+  } finally {
+    if (submitBtn) submitBtn.disabled = false;
+  }
 });
 
 // ===== Helpers =====

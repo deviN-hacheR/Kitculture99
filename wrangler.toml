@@ -1,0 +1,7 @@
+name = "kitculture99"
+compatibility_date = "2024-09-25"
+
+# This site is fully static (HTML/CSS/JS in the website/ folder), served by
+# Cloudflare Workers Static Assets. No build step or server code is needed.
+[assets]
+directory = "./website"
