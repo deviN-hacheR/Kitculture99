@@ -1583,6 +1583,11 @@ body.loaded .intro-curtain {
 }
 
 /* Login gate */
+.admin-gate[hidden],
+.admin-dashboard[hidden] {
+  display: none;
+}
+
 .admin-gate {
   min-height: 100vh;
   display: flex;
