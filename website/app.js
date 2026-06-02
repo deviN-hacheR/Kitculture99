@@ -1,78 +1,9 @@
-// ===== Configuration — customize these for your business =====
-const CONFIG = {
-  businessName: 'KitCulture',
-  whatsappNumber: '919072114858',
-  instagramHandle: 'kitculture.99',
-  products: [
-    {
-      id: 1,
-      name: 'Premium Football Jersey',
-      category: 'football',
-      image: 'images/jersey-1.jpg',
-      badge: 'Bestseller',
-      description: 'Premium quality jersey. DM on Instagram @kitculture.99 to order.'
-    },
-    {
-      id: 2,
-      name: 'Retro Club Kit',
-      category: 'football',
-      image: 'images/jersey-2.jpg',
-      badge: 'New',
-      description: 'Classic retro design. Available in multiple sizes. Ships across India.'
-    },
-    {
-      id: 3,
-      name: 'Vintage Home Jersey',
-      category: 'football',
-      image: 'images/jersey-3.jpg',
-      badge: null,
-      description: 'Thrifted/surplus quality. Limited stock.'
-    },
-    {
-      id: 4,
-      name: 'Street Style Jersey',
-      category: 'football',
-      image: 'images/jersey-4.jpg',
-      badge: 'Popular',
-      description: 'Bold colors, premium fabric. Perfect for match day and everyday wear.'
-    },
-    {
-      id: 5,
-      name: 'Classic Striped Kit',
-      category: 'football',
-      image: 'images/jersey-5.jpg',
-      badge: null,
-      description: 'Iconic striped design. Comfortable fit in S–XXL.'
-    },
-    {
-      id: 6,
-      name: 'Limited Edition Jersey',
-      category: 'football',
-      image: 'images/jersey-6.jpg',
-      badge: 'Limited',
-      description: 'Exclusive drop — grab it before it sells out.'
-    },
-    {
-      id: 7,
-      name: 'Premium Away Kit',
-      category: 'football',
-      image: 'images/jersey-7.jpg',
-      badge: 'New',
-      description: 'Fresh away colors with moisture-wicking fabric.'
-    },
-    {
-      id: 8,
-      name: 'Fan Favourite Jersey',
-      category: 'football',
-      image: 'images/jersey-8.jpg',
-      badge: null,
-      description: 'One of our most loved jerseys. Order via WhatsApp or Instagram DM.'
-    }
-  ],
-  sizes: ['S', 'M', 'L', 'XL', 'XXL']
-};
+// ===== Configuration =====
+// Business info + product catalog live in store.js (shared with the admin panel).
+const CONFIG = STORE_CONFIG;
 
 // ===== State =====
+let products = loadProducts();
 let cart = JSON.parse(localStorage.getItem('kitculture-cart') || '[]');
 let selectedSize = 'M';
 let currentFilter = 'all';
@@ -103,24 +34,35 @@ function productImageHtml(product, className = '') {
 // ===== Products =====
 function renderProducts(filter = 'all') {
   const filtered = filter === 'all'
-    ? CONFIG.products
-    : CONFIG.products.filter(p => p.category === filter);
+    ? products
+    : products.filter(p => p.category === filter);
 
-  productGrid.innerHTML = filtered.map((product, index) => `
-    <article class="product-card" data-id="${product.id}" style="animation-delay: ${index * 0.07}s">
+  if (!filtered.length) {
+    productGrid.innerHTML = '<p class="grid-empty">No jerseys in this category yet — check back soon.</p>';
+    return;
+  }
+
+  productGrid.innerHTML = filtered.map((product, index) => {
+    const soldOut = product.available === false;
+    const priceText = formatPrice(product.price);
+    return `
+    <article class="product-card${soldOut ? ' sold-out' : ''}" data-id="${product.id}" style="animation-delay: ${index * 0.07}s">
       <div class="product-image ${product.category}">
         ${product.badge ? `<span class="product-badge">${product.badge}</span>` : ''}
+        ${soldOut ? '<span class="soldout-overlay"><span>Sold Out</span></span>' : ''}
         ${productImageHtml(product, 'product-photo')}
       </div>
       <div class="product-info">
         <p class="product-category">${product.category}</p>
         <h3>${product.name}</h3>
         <div class="product-footer">
-          <button class="add-btn" data-id="${product.id}">Add to Cart</button>
+          ${priceText ? `<span class="product-price">${priceText}</span>` : '<span></span>'}
+          <button class="add-btn" data-id="${product.id}"${soldOut ? ' disabled' : ''}>${soldOut ? 'Sold Out' : 'Add to Cart'}</button>
         </div>
       </div>
     </article>
-  `).join('');
+  `;
+  }).join('');
 
   productGrid.querySelectorAll('.product-card').forEach(card => {
     card.addEventListener('click', (e) => {
@@ -133,21 +75,27 @@ function renderProducts(filter = 'all') {
   productGrid.querySelectorAll('.add-btn').forEach(btn => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
+      if (btn.disabled) return;
       addToCart(parseInt(btn.dataset.id));
     });
   });
+
+  applyTilt(productGrid.querySelectorAll('.product-card'));
 }
 
 function openProductModal(id) {
-  const product = CONFIG.products.find(p => p.id === id);
+  const product = products.find(p => p.id === id);
   if (!product) return;
 
   selectedSize = 'M';
+  const soldOut = product.available === false;
+  const priceText = formatPrice(product.price);
 
   modalBody.innerHTML = `
     <div class="modal-product">
       <div class="modal-image">${productImageHtml(product, 'modal-photo')}</div>
       <h2>${product.name}</h2>
+      ${priceText ? `<p class="modal-price">${priceText}</p>` : ''}
       <p>${product.description}</p>
       <div class="size-selector">
         <label>Select Size</label>
@@ -157,7 +105,7 @@ function openProductModal(id) {
           `).join('')}
         </div>
       </div>
-      <button class="btn btn-primary btn-full" id="modalAddBtn">Add to Cart</button>
+      <button class="btn btn-primary btn-full" id="modalAddBtn"${soldOut ? ' disabled' : ''}>${soldOut ? 'Sold Out' : 'Add to Cart'}</button>
     </div>
   `;
 
@@ -169,10 +117,13 @@ function openProductModal(id) {
     });
   });
 
-  document.getElementById('modalAddBtn').addEventListener('click', () => {
-    addToCart(id, selectedSize);
-    closeModal();
-  });
+  const modalAddBtn = document.getElementById('modalAddBtn');
+  if (!soldOut) {
+    modalAddBtn.addEventListener('click', () => {
+      addToCart(id, selectedSize);
+      closeModal();
+    });
+  }
 
   modalOverlay.classList.add('active');
   productModal.classList.add('active');
@@ -185,8 +136,12 @@ function closeModal() {
 
 // ===== Cart =====
 function addToCart(productId, size = 'M') {
-  const product = CONFIG.products.find(p => p.id === productId);
+  const product = products.find(p => p.id === productId);
   if (!product) return;
+  if (product.available === false) {
+    showToast(`${product.name} is sold out`);
+    return;
+  }
 
   const existing = cart.find(item => item.id === productId && item.size === size);
   if (existing) {
@@ -226,6 +181,11 @@ function saveCart() {
 function updateCartUI() {
   const totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
 
+  if (totalItems !== Number(cartCount.textContent)) {
+    cartCount.classList.remove('pop');
+    void cartCount.offsetWidth; // restart animation
+    cartCount.classList.add('pop');
+  }
   cartCount.textContent = totalItems;
 
   if (cart.length === 0) {
@@ -238,7 +198,7 @@ function updateCartUI() {
       <div class="cart-item-image">${productImageHtml(item, 'cart-photo')}</div>
       <div class="cart-item-details">
         <h4>${item.name}</h4>
-        <p>Size: ${item.size}</p>
+        <p>Size: ${item.size}${formatPrice(item.price) ? ` · ${formatPrice(item.price)}` : ''}</p>
         <div class="cart-item-actions">
           <button class="qty-btn" data-id="${item.id}" data-size="${item.size}" data-delta="-1">−</button>
           <span>${item.qty}</span>
@@ -273,9 +233,18 @@ function checkout() {
     return;
   }
 
-  const lines = cart.map(item =>
-    `• ${item.name} (${item.size}) x${item.qty}`
-  );
+  const lines = cart.map(item => {
+    const priceText = formatPrice(item.price);
+    const url = absoluteImageUrl(item.image);
+    let line = `• ${item.name} (${item.size}) x${item.qty}`;
+    if (priceText) line += ` — ${priceText}`;
+    if (url && !url.startsWith('data:')) {
+      line += `\n   Photo: ${url}`;
+    } else if (url) {
+      line += `\n   (custom photo — sending it now)`;
+    }
+    return line;
+  });
   const message = encodeURIComponent(
     `Hi! I'd like to place an order from ${CONFIG.businessName} (@${CONFIG.instagramHandle}):\n\n${lines.join('\n')}\n\nPlease confirm availability and payment details.`
   );
@@ -387,7 +356,115 @@ document.addEventListener('keydown', (e) => {
   }
 });
 
+// ===== Cinematic enhancements =====
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// Subtle 3D tilt on cards that follows the cursor.
+function applyTilt(elements) {
+  if (prefersReducedMotion || window.matchMedia('(hover: none)').matches) return;
+  elements.forEach(el => {
+    el.addEventListener('pointermove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const px = (e.clientX - rect.left) / rect.width - 0.5;
+      const py = (e.clientY - rect.top) / rect.height - 0.5;
+      el.style.transform = `perspective(900px) rotateX(${(-py * 6).toFixed(2)}deg) rotateY(${(px * 8).toFixed(2)}deg) translateY(-6px)`;
+    });
+    el.addEventListener('pointerleave', () => {
+      el.style.transform = '';
+    });
+  });
+}
+
+// Count-up animation for the hero stats (e.g. 500+, 48hr, 100%).
+function initCountUp() {
+  const stats = document.querySelectorAll('.hero-stats .stat strong');
+  if (!stats.length) return;
+  if (prefersReducedMotion) return;
+
+  stats.forEach(el => {
+    const raw = el.textContent.trim();
+    const match = raw.match(/^(\d+)(.*)$/);
+    if (!match) return;
+    const target = parseInt(match[1], 10);
+    const suffix = match[2] || '';
+    let start = null;
+    const duration = 1400;
+    function step(ts) {
+      if (start === null) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target) + suffix;
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+
+// Scroll progress bar across the top of the page.
+function initScrollProgress() {
+  const bar = document.getElementById('scrollProgress');
+  if (!bar) return;
+  window.addEventListener('scroll', () => {
+    const h = document.documentElement;
+    const scrolled = h.scrollTop / (h.scrollHeight - h.clientHeight);
+    bar.style.transform = `scaleX(${scrolled || 0})`;
+  }, { passive: true });
+}
+
+// Gentle parallax drift on the hero glow following the cursor.
+function initHeroParallax() {
+  if (prefersReducedMotion) return;
+  const heroBg = document.querySelector('.hero-bg');
+  const hero = document.querySelector('.hero');
+  if (!heroBg || !hero) return;
+  hero.addEventListener('pointermove', (e) => {
+    const rect = hero.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    heroBg.style.transform = `translate(${x * 24}px, ${y * 24}px) scale(1.06)`;
+  });
+  hero.addEventListener('pointerleave', () => {
+    heroBg.style.transform = '';
+  });
+}
+
+// Back-to-top button.
+function initBackToTop() {
+  const btn = document.getElementById('backToTop');
+  if (!btn) return;
+  window.addEventListener('scroll', () => {
+    btn.classList.toggle('visible', window.scrollY > 600);
+  }, { passive: true });
+  btn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+// Remove the cinematic intro overlay once the page is ready.
+function initIntro() {
+  requestAnimationFrame(() => {
+    document.body.classList.add('loaded');
+  });
+}
+
+// Keep the storefront in sync with admin panel changes (other tabs + same tab).
+function refreshProducts() {
+  products = loadProducts();
+  renderProducts(currentFilter);
+}
+window.addEventListener('storage', (e) => {
+  if (e.key === STORE_KEY) refreshProducts();
+});
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') refreshProducts();
+});
+
 // ===== Init =====
 renderProducts();
 updateCartUI();
 initScrollReveal();
+initCountUp();
+initScrollProgress();
+initHeroParallax();
+initBackToTop();
+initIntro();

@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+  <title>KitCulture — Admin Panel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="admin-body">
+
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- Login gate -->
+  <div class="admin-gate" id="adminGate">
+    <form class="admin-login" id="adminLogin">
+      <a href="index.html" class="logo admin-login-logo">
+        <img src="images/profile-logo.jpg" alt="KitCulture" class="logo-img" width="42" height="42">
+        <span class="logo-text">Kit<span class="accent">Culture</span></span>
+      </a>
+      <h1>Admin Panel</h1>
+      <p>Enter the password to manage stock.</p>
+      <div class="form-group">
+        <label for="adminPassword">Password</label>
+        <input type="password" id="adminPassword" autocomplete="current-password" placeholder="••••" required>
+      </div>
+      <p class="admin-error" id="adminError" hidden>Incorrect password. Try again.</p>
+      <button type="submit" class="btn btn-primary btn-full">Unlock</button>
+      <a href="index.html" class="admin-back-link">&larr; Back to store</a>
+    </form>
+  </div>
+
+  <!-- Dashboard -->
+  <div class="admin-dashboard" id="adminDashboard" hidden>
+    <header class="admin-header">
+      <a href="index.html" class="logo">
+        <img src="images/profile-logo.jpg" alt="KitCulture" class="logo-img" width="42" height="42">
+        <span class="logo-text">Kit<span class="accent">Culture</span> <span class="admin-tag">Admin</span></span>
+      </a>
+      <div class="admin-header-actions">
+        <a href="index.html" class="btn btn-outline btn-sm" target="_blank" rel="noopener">View Store</a>
+        <button class="btn btn-outline btn-sm" id="logoutBtn">Lock</button>
+      </div>
+    </header>
+
+    <main class="admin-main container">
+      <!-- Add new stock -->
+      <section class="admin-section">
+        <h2>Add New Stock</h2>
+        <form class="admin-form" id="addProductForm">
+          <div class="admin-form-grid">
+            <div class="form-group">
+              <label for="newName">Product Name</label>
+              <input type="text" id="newName" required placeholder="e.g. Limited Away Kit">
+            </div>
+            <div class="form-group">
+              <label for="newPrice">Price (₹)</label>
+              <input type="number" id="newPrice" min="0" step="1" placeholder="e.g. 1299">
+            </div>
+            <div class="form-group">
+              <label for="newCategory">Category</label>
+              <select id="newCategory">
+                <option value="football">Football</option>
+                <option value="basketball">Basketball</option>
+                <option value="cricket">Cricket</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="newBadge">Badge (optional)</label>
+              <input type="text" id="newBadge" placeholder="e.g. New, Limited">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="newDescription">Description</label>
+            <textarea id="newDescription" rows="2" placeholder="Short description shown on the product"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="newPhoto">Product Photo</label>
+            <input type="file" id="newPhoto" accept="image/*" required>
+            <div class="photo-preview" id="photoPreview" hidden>
+              <img id="photoPreviewImg" alt="Preview">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary">Add Product</button>
+        </form>
+      </section>
+
+      <!-- Manage stock -->
+      <section class="admin-section">
+        <div class="admin-section-head">
+          <h2>Manage Stock</h2>
+          <span class="admin-count" id="adminCount"></span>
+        </div>
+        <div class="admin-products" id="adminProducts"></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="store.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

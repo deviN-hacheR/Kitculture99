@@ -74,13 +74,33 @@ Main colors are in `styles.css` under `:root`:
 - `--accent` — Primary brand color (default: teal `#00d4aa`)
 - `--bg-dark` — Background color
 
+## Admin Panel
+
+The site includes a password-protected admin panel at **`admin.html`** (also linked from the footer under *Policies → Admin*).
+
+- **Password:** `nsk`
+- **Manage stock:** flip the toggle on any product to mark it *In Stock* / *Sold Out*. Sold-out items show a "Sold Out" overlay on the storefront and can't be added to the cart.
+- **Add new stock:** upload a photo, set a name, price, category, optional badge, and description. New products appear on the storefront instantly.
+- **Delete:** remove any product.
+
+Stock data is stored in the browser (`localStorage`), and the storefront syncs automatically when admin changes are made.
+
+> ⚠️ The admin password is checked in the browser only — it keeps casual visitors out but is **not** real security. For a public store, move stock management behind a backend with server-side auth.
+
+## Orders include the product photo
+
+When a customer checks out, the WhatsApp order message now includes the **image URL** of each item (so you instantly see which jersey was ordered). For admin-uploaded photos (stored locally as image data), the message prompts the customer to send the photo.
+
 ## File Structure
 
 ```
 website/
-├── index.html    # Main page
+├── index.html    # Storefront
+├── admin.html    # Password-protected admin panel
+├── store.js      # Shared product catalog + stock helpers (localStorage)
+├── app.js        # Storefront: cart, checkout, animations
+├── admin.js      # Admin: stock management, add/delete products
 ├── styles.css    # All styling
-├── app.js        # Products, cart, checkout logic
 └── README.md     # This file
 ```
 
